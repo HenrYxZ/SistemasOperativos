@@ -1,6 +1,8 @@
-# Tarea 2
-# C - Look Simulation
+# Tarea 2 IIC2333
+# Hernaldo Jesus Henriquez
+# Planning Simulation
 # list 3-45-32-67-94-73
+# list2 86-147-13-29-174-94-150-33-102-175-130-27-95
 
 def getMin(petitions, current, orderer):
 
@@ -8,8 +10,10 @@ def getMin(petitions, current, orderer):
 		return getMinClook(petitions, current)
 	elif orderer == 2:
 		return getMinSSTF(petitions, current)
-	else:
+	elif orderer == 3:
 		return getMinScan(petitions, current)
+	else:
+		return getMinFCFS(petitions, current)
 
 def getMinClook(petitions, current):
 
@@ -48,35 +52,45 @@ def getMinSSTF(petitions, current):
 def getMinScan(petitions, current):
 
 	min_distance = end
+	min_cilinder = petitions[0]
 	for cilinder in petitions:
 		# Solo se cuentan cilindros mayores, pues estamos en orden creciente
 		print "hello"
 		# print str(num_cilinder) + "num_cilinder"
 		# print str(current) + "current"
 		if direction == -1:
-			# Si vamos en orden descendente damos vuelta todo
-			cilinder *= -1
-			current *= -1
+			if cilinder < current:
+				print "menor"
+				distance = current - cilinder
+				print "distance: " + str(distance)
+				if distance < min_distance:
+					min_distance = distance
+					min_cilinder = cilinder
 
-		if cilinder > current:
-			print "mayor"
-			distance = cilinder - current
-			print "distance: " + str(distance)
-			if distance < min_distance:
-				min_distance = distance
-				min_cilinder = cilinder
+		else:
+			if cilinder > current:
+				print "mayor"
+				distance = cilinder - current
+				print "distance: " + str(distance)
+				if distance < min_distance:
+					min_distance = distance
+					min_cilinder = cilinder
 
-	if direction == -1:
-		# Si vamos en orden descendente volvemos a lo anterior
-		min_cilinder *= -1
-		current *= -1
+
+	return [min_cilinder, min_distance]
+
+def getMinFCFS(petitions, current):
+
+	min_cilinder = petitions[0]
+	min_distance = abs(current - min_cilinder)
+	print "distance: " + str(min_distance)
 
 	return [min_cilinder, min_distance]
 
 def checkBorder(petitions, current):
 
 	# Si se llego al ultimo cilindro volver al inicio
-	if current > max(petitions):
+	if direction == 1 and current > max(petitions):
 		return True
 	else:
 		return False
@@ -98,13 +112,13 @@ def comeBackScan(petitions, current):
 # --------------    main ---------------------------------
 
 beginning = 0
-end = 100
+end = 99
 # global direction
-direction = 1
+direction = 1 # ascendente: 1, descendente: -1
 
 text = raw_input("ingrese lista de peticiones \r\n")
 current = input("ingrese la posicion inicial del cabezal \r\n")
-orderer = input("ingrese 1: C-Look, 2: SSTF, 3: SCAN \r\n")
+orderer = input("ingrese 1: C-Look, 2: SSTF, 3: SCAN, 4: FCFS \r\n")
 print current
 
 petitions = text.split("-")
@@ -112,10 +126,16 @@ petitions = text.split("-")
 for i in range(len(petitions)):
 	petitions[i] = int(petitions[i])
 
-petitions.sort()
+if orderer != 4:
+	petitions.sort()
+
+list_length = len(petitions)
 order = []
 times = []
+respond_times = []
 total_time = 0
+
+min_cilinder = petitions[0]
 
 # ------ Hasta que las peticiones se acaben
 while(petitions):
@@ -131,11 +151,12 @@ while(petitions):
 	order.append(current)
 	times.append(min_distance)
 	total_time += min_distance
+	respond_times.append(total_time)
 
 	print current
 	petitions.remove(current)
 
-	if len(petitions) != 0 and orderer != 2:
+	if len(petitions) != 0 and (orderer == 1 or orderer == 3):
 
 		if checkBorder(petitions, current):
 			if orderer == 1:
@@ -149,6 +170,7 @@ while(petitions):
 			order.append(current)
 			times.append(distance)
 			total_time += distance
+			respond_times.append(total_time)
 
 			petitions.remove(current)
 			print str(current) + " from C"
@@ -165,4 +187,9 @@ print "Tiempos"
 print times
 print "Total"
 print total_time
+print "Tiempo respuesta promedio"
+total = 0
+for time in respond_times:
+	total += time
+print float(total_time) / list_length 
 
