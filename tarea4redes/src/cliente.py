@@ -18,17 +18,13 @@ class Cliente:
         '''
         self.host = server_address
         self.puerto = port
-        self.s = socket.socket
+        self.s = socket.socket()
         self.aknowledge = 0
     def conectar(self):
         '''
         Conexion al servidor por el host y puerto predefinido
         '''
-        try:
-            self.s.connect((self.host, self.puerto))
-        except:
-            print "Unable to connect"
-            sys.exit()
+        self.s.connect((self.host, self.puerto))
         print("Connected to remote host " + self.host)
         
     def enviar_imagen(self, image_path):
@@ -41,12 +37,14 @@ class Cliente:
         file.close()
         
         self.s.send(img)
-        print("Imagen" + image_path + "enviada")
-        aknowledge = self.s.recv(1024)
+        print("Imagen " + image_path + " enviada")
+        self.aknowledge = self.s.recv(1024)
+        print(self.aknowledge)
         
     def cerrar(self):
+        print("Conexion terminada")
         self.s.close()
-        print(self.aknowledge)
+        
 
 # ----------- MAIN -----------------------------
 if __name__ == '__main__':

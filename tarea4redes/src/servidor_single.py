@@ -5,7 +5,6 @@ Created on 10-11-2013
 '''
 
 import socket
-from threading import Thread
 
 class Servidor:
     '''
@@ -20,12 +19,12 @@ class Servidor:
         self.puerto = port
         self.s = socket.socket()
         self.counter = 1
-        self.client_sockets = []
-        self.client_addresses = []
+        self.client_socket
+        self.client_address
         
     def conectar(self):
         self.s.bind((self.host, self.puerto))
-        self.s.listen(5)
+        self.s.listen(1)
         print("Servidor " + self.host + " establecido")
         
     def escuchar_cliente(self, conn, addr):
@@ -38,19 +37,14 @@ class Servidor:
             data = conn.recv(4096)
             copied_img.write(data)
             if not data:
-                self.client_sockets.remove(conn)
-                self.client_addresses.remove(addr)
                 break
         conn.send("Image loaded as " + copy_name)
         conn.close()
     
     def aceptar(self):
-        conn, addr = self.s.accept()
-        print("Connected by ", addr)
-        self.client_sockets.append(conn)
-        self.client_addresses.append(addr)
-        t = Thread(target=self.escuchar_cliente, args = (conn, addr,))
-        t.start()
+        self.client_socket , self.client_address = self.s.accept()
+        print("Connected by ", self.client_address)
+        self.escuchar_cliente(self.client_socket, self.client_address)
         
     def cerrar(self):
         self.s.close()
