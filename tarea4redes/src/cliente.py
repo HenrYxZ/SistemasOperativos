@@ -11,28 +11,25 @@ class Cliente:
     '''
     Cliente de Socket de Python
     '''
-    global host
-    global puerto
-    global s
-    global aknowledge
 
     def __init__(self, server_address, port):
         '''
         Constructor
         '''
-        host = server_address
-        puerto = port
-        s = socket.socket
+        self.host = server_address
+        self.puerto = port
+        self.s = socket.socket
+        self.aknowledge = 0
     def conectar(self):
         '''
         Conexion al servidor por el host y puerto predefinido
         '''
         try:
-            s.connect((host,puerto))
+            self.s.connect((self.host, self.puerto))
         except:
             print "Unable to connect"
             sys.exit()
-        print("Connected to remote host " + host)
+        print("Connected to remote host " + self.host)
         
     def enviar_imagen(self, image_path):
         
@@ -43,13 +40,13 @@ class Cliente:
         img = file.read()
         file.close()
         
-        s.send(img)
+        self.s.send(img)
         print("Imagen" + image_path + "enviada")
-        aknowledge = s.recv(1024)
+        aknowledge = self.s.recv(1024)
         
     def cerrar(self):
-        s.close()
-        print(aknowledge)
+        self.s.close()
+        print(self.aknowledge)
 
 # ----------- MAIN -----------------------------
 if __name__ == '__main__':
