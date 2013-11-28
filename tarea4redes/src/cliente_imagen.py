@@ -18,7 +18,7 @@ class Cliente:
         '''
         self.host = server_address
         self.puerto = port
-        self.s = socket.socket()
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.aknowledge = 0
     def conectar(self):
         '''
@@ -32,12 +32,13 @@ class Cliente:
         '''
         Se envia una imagen indicando la direccion de esta
         '''
-        file = open(image_path, 'rb')
-        img = file.read()
-        file.close()
+        img_file = open(image_path, 'rb')
+        img = img_file.read()
+        img_file.close()
         
-        self.s.send(img)
+        self.s.sendall(img)
         print("Imagen " + image_path + " enviada")
+        self.s.sendall("end")
         self.aknowledge = self.s.recv(1024)
         print(self.aknowledge)
         
@@ -52,9 +53,9 @@ if __name__ == '__main__':
         print 'Usage : python cliente.py hostname'
         sys.exit()
 
-    client = Cliente(sys.argv[1], 52000)
+    client = Cliente(sys.argv[1], 3000)
     client.conectar()
-    print 'Ingrese el path de la imagen (ej. avatar.jpg)'
+    print('Ingrese el path de la imagen (ej. avatar.jpg)')
     image_path = raw_input()
     client.enviar_imagen(image_path)
     client.cerrar()
